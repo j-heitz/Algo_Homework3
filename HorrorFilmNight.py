@@ -3,25 +3,19 @@ input = sys.stdin.readline
 # Read input
 emma_data = list(map(int, input().split()))
 marcos_data = list(map(int, input().split()))
-n = 1000000  # total days
-# Build film array
-# -1 = cannot watch (neither likes)
-# 0 = neutral / both like
-# 1 = only Marcos likes
-# 2 = only Emma likes
+# Build film array using sets (order-independent, touches only listed days)
+emma = set(emma_data[1:])
+marcos = set(marcos_data[1:])
+max_day = max((emma | marcos) or {0})
+n = max_day + 1
 film = [-1] * n
-# Mark Emma's liked films
-for day in emma_data[1:]:
-    if film[day] == 1:  # Marcos also likes → neutral
+for day in emma | marcos:
+    if day in emma and day in marcos:
         film[day] = 0
+    elif day in emma:
+        film[day] = 2
     else:
-        film[day] = 2  # only Emma likes
-# Mark Marcos's liked films
-for day in marcos_data[1:]:
-    if film[day] == 2:  # Emma also likes → neutral
-        film[day] = 0
-    else:
-        film[day] = 1  # only Marcos likes
+        film[day] = 1
 # DP table
 # H[i][last_disliked] = max films from day i to end
 # last_disliked: 0 = nobody, 1 = Marcos, 2 = Emma
